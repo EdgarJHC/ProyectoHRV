@@ -1,0 +1,16 @@
+{% extends 'base.html' %}  <!-- Extiende la plantilla base.html para mantener la consistencia en el diseño -->
+
+{% block content %}  <!-- Inicia el bloque de contenido que se insertará en la plantilla base -->
+
+<h1>Crear nuevo registro</h1>  <!-- Título de la página para crear un nuevo registro de paciente -->
+
+{{error}}  <!-- Muestra cualquier mensaje de error que pueda haberse generado durante la creación del registro -->
+
+<form action="/create_paciente/" method="POST">  <!-- Formulario que envía una solicitud POST a la URL especificada -->
+  {% csrf_token %}  <!-- Token de seguridad CSRF para proteger contra ataques CSRF -->
+  {{form}}  <!-- Renderiza el formulario PacienteForm, que incluye los campos necesarios para crear un nuevo paciente -->
+
+  <button>Guardar</button>  <!-- Botón para enviar el formulario y guardar el nuevo registro -->
+</form>
+
+{% endblock %}  <!-- Finaliza el bloque de contenido -->

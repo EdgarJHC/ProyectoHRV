@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Registros de Pacientes</h1>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Brand</a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <form class="d-flex ms-auto" style="flex-grow: 1;">
+        <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" style="width: 100%;">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<table class="table table-striped mt-3">  <!-- Tabla estilizada con Bootstrap -->
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Título</th>
+      <th>Descripción</th>
+      <th>Fecha de Finalización</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for paciente in pacientes %}
+    <tr>
+      <td>{{ paciente.id }}</td>
+      <td>
+        <a href="{% url 'paciente_detail' paciente.id %}">  <!-- Enlace a la vista de detalles del paciente -->
+          {% if paciente.important %}
+            <strong>{{ paciente.title }}</strong>
+          {% else %}
+            {{ paciente.title }}
+          {% endif %}
+        </a>
+      </td>
+      <td>{{ paciente.description }}</td>
+      <td>{{ paciente.datecompleted|date:'j M Y:i' }}</td>
+      <td>
+        <a href="{% url 'paciente_detail' paciente.id %}" class="btn btn-info btn-sm">Ver Detalles</a>  <!-- Botón para ver detalles -->
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ paciente.title }}</h1>
+
+{% if error %}  <!-- Verifica si hay un error -->
+<div class="alert alert-danger">{{ error }}</div>  <!-- Muestra el mensaje de error en un div de alerta -->
+{% endif %}
+
+<h2>Detalles del Paciente</h2>  <!-- Subtítulo para los detalles del paciente -->
+<form method="POST" class="mt-3">  <!-- Inicia un formulario para actualizar los detalles del paciente -->
+  {% csrf_token %}
+  {{ form.as_p }}  <!-- Renderiza el formulario como párrafos -->
+
+  <button type="submit" class="btn btn-primary">Actualizar</button>  <!-- Botón para enviar el formulario de actualización -->
+</form>
+
+<h2>Acciones</h2>  <!-- Subtítulo para acciones -->
+<form action="{% url 'complete_paciente' paciente.id %}" method="POST" class="mt-2">  <!-- Formulario para marcar el paciente como completado -->
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success">Finalizar</button>  <!-- Botón para enviar la solicitud de completar el paciente -->
+</form>
+
+<form action="{% url 'delete_paciente' paciente.id %}" method="POST" class="mt-2">  <!-- Formulario para eliminar el paciente -->
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Eliminar</button>  <!-- Botón para enviar la solicitud de eliminar el paciente -->
+</form>
+
+{% endblock %}
