@@ -24,28 +24,42 @@
 <table class="table table-striped mt-3">  <!-- Tabla estilizada con Bootstrap -->
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Título</th>
-      <th>Descripción</th>
-      <th>Fecha de Finalización</th>
-      <th>Acciones</th>
+      <th>ID</th>  <!-- Asegúrate de mostrar el ID del paciente -->
+      <th>Nombre de Usuario</th>
+      <th>Nombre(s)</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
+      <th>Género</th>
+      <th>Uso de Medicamentos</th>
+      <th>Actividad Física</th>
+      <th>Teléfono</th>
+      <th>Correo Electrónico</th>
+      <th>Fecha de Nacimiento</th>
+      <th>Acciones</th>  <!-- Columna para acciones como ver detalles -->
     </tr>
   </thead>
   <tbody>
     {% for paciente in pacientes %}
     <tr>
-      <td>{{ paciente.id }}</td>
+      <td>{{ paciente.id }}</td>  <!-- Muestra el ID del paciente -->
       <td>
         <a href="{% url 'paciente_detail' paciente.id %}">  <!-- Enlace a la vista de detalles del paciente -->
-          {% if paciente.important %}
-            <strong>{{ paciente.title }}</strong>
+          {% if paciente.user.username %}  <!-- Asegúrate de acceder al campo correcto -->
+            <strong>{{ paciente.user.username }}</strong>  <!-- Asume que el nombre de usuario está en la relación user -->
           {% else %}
-            {{ paciente.title }}
+            {{ paciente.user.username }}
           {% endif %}
         </a>
       </td>
-      <td>{{ paciente.description }}</td>
-      <td>{{ paciente.datecompleted|date:'j M Y:i' }}</td>
+      <td>{{ paciente.nombre_paciente }}</td>  <!-- Cambiar description a nombre_paciente -->
+      <td>{{ paciente.apellido_paterno }}</td>
+      <td>{{ paciente.apellido_materno }}</td>
+      <td>{{ paciente.sexo }}</td>  <!-- Muestra el sexo del paciente -->
+      <td>{{ paciente.uso_de_medicamentos }}</td>  <!-- Muestra el uso de medicamentos -->
+      <td>{{ paciente.actividad_fisica }}</td>  <!-- Muestra la actividad física -->
+      <td>{{ paciente.telefono }}</td>
+      <td>{{ paciente.correo }}</td>  <!-- Asegúrate de mostrar el correo -->
+      <td>{{ paciente.fecha_nacimiento|date:'j M Y' }}</td>  <!-- Formato de fecha -->
       <td>
         <a href="{% url 'paciente_detail' paciente.id %}" class="btn btn-info btn-sm">Ver Detalles</a>  <!-- Botón para ver detalles -->
       </td>

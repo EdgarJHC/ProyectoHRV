@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
+
+{% block content %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/stylesSignup.css' %}">
-{% block content %}
-
 <div class="container">
   <h1>Registrar información</h1>
 
@@ -10,7 +10,7 @@
     <div class="alert alert-danger">{{ error }}</div>
   {% endif %}
 
-  <form action="/signup/" method="POST">
+  <form action="{% url 'signup' %}" method="POST">
     {% csrf_token %}
 
     <div class="container mt-5">
@@ -32,28 +32,6 @@
         <label for="apellido_materno">Apellido Materno:</label>
         <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" placeholder="Ingresa tu apellido materno" required>
       </div>
-
-      <!-- Edad -->
-      <div class="form-group">
-        <label for="edad">Edad:</label>
-        <input type="number" class="form-control" id="edad" name="edad" placeholder="Ingresa tu edad" required>
-      </div>
-
-
-            <!-- Dirección -->
-      <div class="form-group">
-        <label for="direccion">Selecciona una dirección:</label>
-        <select class="form-select" id="direccion" name="direccion" required>
-            <option value="">Seleccione una dirección</option> <!-- Opción por defecto -->
-            {% for dir in direcciones %} <!-- Asegúrate de pasar direcciones a la plantilla -->
-                <option value="{{ dir.id }}">{{ dir.descripcion }}</option> <!-- Ajusta 'descripcion' al campo que describa la dirección -->
-            {% endfor %}
-        </select>
-        <small class="form-text text-muted">Selecciona una dirección.</small>
-      </div>
-
-
-
 
       <!-- Departamento -->
       <div class="form-group">
@@ -79,7 +57,15 @@
         <input type="email" class="form-control" id="correo" name="correo" placeholder="Ingresa tu correo electrónico" required>
       </div>
 
-      <!-- Especialidad -->
+
+
+      <!-- Fecha de nacimiento -->
+       <div class="form-group">
+        <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+        <input type="date" class="form-date" id="fecha_nacimiento" name="fecha_nacimiento" placeholder="Ingresa tu fecha de nacimiento" required>
+       </div>
+
+      <!--Especialidad -->
       <div class="form-group">
         <label for="especialidad">Especialidad:</label>
         <input type="text" class="form-control" id="especialidad" name="especialidad" placeholder="Ingresa tu especialidad" required>

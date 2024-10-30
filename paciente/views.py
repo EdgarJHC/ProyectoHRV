@@ -1,73 +1,105 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .models import Paciente, Especialista, Departamento, Direccion
-from .forms import PacienteForm, EspecialistaForm
+from .models import Paciente, Especialista, Departamento
+from .forms import PacienteForm, UserRegistrationForm
 
-# Vista para el registro de un nuevo usuario
-# Vista para el registro de un nuevo usuario
-# Vista para el registro de un nuevo usuario
 def signup(request):
     if request.method == 'GET':
-        departamentos = Departamento.objects.all()  # Obtiene todos los departamentos
-        direcciones = Direccion.objects.all()  # Obtiene todas las direcciones
-        return render(request, 'signup.html', {"form": UserCreationForm(), "departamentos": departamentos, "direcciones": direcciones})
+        departamentos = Departamento.objects.all()
+        form = UserRegistrationForm()
+        return render(request, 'signup.html', {"form": form, "departamentos": departamentos})
     else:
-        if request.POST["password1"] == request.POST["password2"]:
-            try:
-                user = User.objects.create_user(
-                    username=request.POST["username"], password=request.POST["password1"]
-                )
-                user.save()
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            password1 = form.cleaned_data.get('password1')
+            password2 = form.cleaned_data.get('password2')
+            if password1 == password2:
+                try:
+                    # Intento de crear el usuario
+                    user = form.save(commit=False)
+                    user.set_password(password1)  # Encripta la contraseña antes de guardar el usuario
+                    user.save()
 
-                # Recoge los datos del formulario
-                nombre_especialista = request.POST.get("nombres")
-                apellido_paterno = request.POST.get("apellido_paterno")
-                apellido_materno = request.POST.get("apellido_materno")
-                telefono = request.POST.get("telefono")
-                correo = request.POST.get("correo")
-                especialidad = request.POST.get("especialidad")
-                departamento_id = request.POST["departamento"]  # ID del departamento
-                edad = request.POST.get("edad")
-                direccion_id = request.POST["direccion"]  # ID de la dirección
+                    # Recoge los datos del formulario adicionales
+                    nombre_especialista = request.POST.get("nombres")
+                    apellido_paterno = request.POST.get("apellido_paterno")
+                    apellido_materno = request.POST.get("apellido_materno")
+                    telefono = request.POST.get("telefono")
+                    correo = request.POST.get("correo")
+                    especialidad = request.POST.get("especialidad")
+                    departamento_id = request.POST.get("departamento")
+                    fecha_nacimiento = request.POST.get("fecha_nacimiento")
 
-                # Crea el objeto Especialista
-                especialista = Especialista.objects.create(
-                    user=user,
-                    nombre_especialista=nombre_especialista,
-                    apellido_paterno=apellido_paterno,
-                    apellido_materno=apellido_materno,
-                    telefono=telefono,
-                    correo=correo,
-                    especialidad=especialidad,
-                    edad=edad,
-                    direccion_idDireccion_id=direccion_id,  # Usa el ID de la dirección
-                    departamento_id_departamento_id=departamento_id  # Usa el ID del departamento
-                )
-                especialista.save()
+                    # Validación de que la fecha de nacimiento no sea nula
+                    if not fecha_nacimiento:
+                        return render(request, 'signup.html', {
+                            "form": form,
+                            "departamentos": Departamento.objects.all(),
+                            "error": "Por favor, proporciona una fecha de nacimiento válida."
+                        })
 
-                login(request, user)
-                return redirect('pacientes')
-            except IntegrityError:
-                return render(request, 'signup.html', {"form": UserCreationForm(), "error": "El usuario ya existe."})
+                    # Obtiene la instancia de Departamento usando el ID proporcionado
+                    departamento = Departamento.objects.get(id_departamento=departamento_id)
 
-        return render(request, 'signup.html', {"form": UserCreationForm(), "error": "No coinciden las contraseñas."})
+                    # Crea el objeto Especialista
+                    especialista = Especialista.objects.create(
+                        user=user,
+                        nombre_especialista=nombre_especialista,
+                        apellido_paterno=apellido_paterno,
+                        apellido_materno=apellido_materno,
+                        telefono=telefono,
+                        correo=correo,
+                        especialidad=especialidad,
+                        fecha_nacimiento=fecha_nacimiento,
+                        departamento_id=departamento  # Ahora asigna la instancia de Departamento
+                    )
+                    especialista.save()
+
+                    login(request, user)
+                    return redirect('pacientes')
+                except IntegrityError as e:
+                    print(e)  # Esto imprimirá la excepción completa en la consola.
+                    if 'UNIQUE constraint' in str(e):
+                        error_message = "El usuario ya existe. Prueba con otro nombre de usuario."
+                    else:
+                        error_message = f"Ocurrió un error durante el registro: {e}."  # Muestra el error específico
+                    return render(request, 'signup.html', {
+                        "form": form,
+                        "departamentos": Departamento.objects.all(),
+                        "error": error_message
+                    })
+
+            else:
+                # Si las contraseñas no coinciden
+                return render(request, 'signup.html', {
+                    "form": form,
+                    "departamentos": Departamento.objects.all(),
+                    "error": "Las contraseñas no coinciden."
+                })
+        
+        # Si el formulario no es válido
+        return render(request, 'signup.html', {
+            "form": form,
+            "departamentos": Departamento.objects.all(),
+            "error": "Por favor corrige los errores del formulario."
+        })
 
 # Vista para mostrar los pacientes pendientes (no completados)
 @login_required
 def pacientes(request):
-    pacientes = Paciente.objects.filter(user=request.user, datecompleted__isnull=True)
+    pacientes = Paciente.objects.filter(user=request.user, fecha_nacimiento__isnull=True)
     return render(request, 'paciente.html', {"pacientes": pacientes})
 
 # Vista para mostrar los pacientes completados
 @login_required
 def pacientes_completed(request):
-    pacientes = Paciente.objects.filter(user=request.user, datecompleted__isnull=False).order_by('-datecompleted')
-    return render(request, 'paciente.html', {"pacientes": pacientes})
+    pacientes = Paciente.objects.filter(user=request.user, fecha_nacimiento__isnull=False).order_by('-fecha_nacimiento')
+    return render(request, 'paciente_completed.html', {"pacientes": pacientes})  # Usa una plantilla diferente
 
 # Vista para crear un nuevo paciente
 @login_required
@@ -75,14 +107,16 @@ def create_paciente(request):
     if request.method == "GET":
         return render(request, 'create_paciente.html', {"form": PacienteForm()})
     else:
-        try:
-            form = PacienteForm(request.POST)  # Carga los datos del formulario
-            new_paciente = form.save(commit=False)  # Crea un nuevo paciente, pero no lo guarda aún
-            new_paciente.user = request.user  # Asigna el paciente al usuario actual
-            new_paciente.save()  # Guarda el paciente en la base de datos
-            return redirect('pacientes')  # Redirige a la lista de pacientes
-        except ValueError:
-            return render(request, 'create_paciente.html', {"form": PacienteForm(), "error": "Surgió un error al crear al paciente."})
+        form = PacienteForm(request.POST)
+        if form.is_valid():
+            try:
+                new_paciente = form.save(commit=False)
+                new_paciente.user = request.user
+                new_paciente.save()
+                return redirect('pacientes')
+            except ValueError:
+                return render(request, 'create_paciente.html', {"form": PacienteForm(), "error": "Surgió un error al crear al paciente."})
+        return render(request, 'create_paciente.html', {"form": form, "error": "Por favor corrige los errores del formulario."})
 
 # Vista para mostrar la página de inicio
 def home(request):
@@ -91,8 +125,8 @@ def home(request):
 # Vista para cerrar la sesión de un usuario
 @login_required
 def signout(request):
-    logout(request)  # Cierra la sesión
-    return redirect('home')  # Redirige a la página de inicio
+    logout(request)
+    return redirect('home')
 
 # Vista para el inicio de sesión
 def signin(request):
@@ -100,7 +134,7 @@ def signin(request):
         return render(request, 'signin.html', {"form": AuthenticationForm()})
     else:
         user = authenticate(
-            request, username=request.POST['username'], password=request.POST['password'])
+            request, username=request.POST['username'], password=request.POST['password1'])
         if user is None:
             return render(request, 'signin.html', {"form": AuthenticationForm(), "error": "Nombre de usuario o contraseña incorrectos."})
 
@@ -110,25 +144,23 @@ def signin(request):
 # Vista para mostrar los detalles de un paciente específico
 @login_required
 def paciente_detail(request, paciente_id):
+    paciente = get_object_or_404(Paciente, pk=paciente_id, user=request.user)
     if request.method == 'GET':
-        paciente = get_object_or_404(Paciente, pk=paciente_id, user=request.user)
         form = PacienteForm(instance=paciente)
         return render(request, 'paciente_detail.html', {'paciente': paciente, 'form': form})
     else:
-        try:
-            paciente = get_object_or_404(Paciente, pk=paciente_id, user=request.user)
-            form = PacienteForm(request.POST, instance=paciente)
-            form.save()  # Guarda los cambios en la base de datos
+        form = PacienteForm(request.POST, instance=paciente)
+        if form.is_valid():
+            form.save()
             return redirect('pacientes')
-        except ValueError:
-            return render(request, 'paciente_detail.html', {'paciente': paciente, 'form': form, 'error': 'Error al actualizar al paciente.'})
+        return render(request, 'paciente_detail.html', {'paciente': paciente, 'form': form, 'error': 'Error al actualizar al paciente.'})
 
 # Vista para marcar un paciente como completado
 @login_required
 def complete_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, pk=paciente_id, user=request.user)
     if request.method == 'POST':
-        paciente.datecompleted = timezone.now()
+        paciente.fecha_nacimiento = timezone.now()
         paciente.save()
         return redirect('pacientes')
 
@@ -140,7 +172,7 @@ def delete_paciente(request, paciente_id):
         paciente.delete()
         return redirect('pacientes')
 
-# Perfil
+# Vista del perfil del especialista
 @login_required
 def perfil_doc(request):
     user = request.user
@@ -150,8 +182,8 @@ def perfil_doc(request):
             'nombre_especialista': doctor.nombre_especialista,
             'apellido_paterno': doctor.apellido_paterno,
             'apellido_materno': doctor.apellido_materno,
-            'edad': doctor.edad,
-            'departamento': doctor.departamento,
+            'fecha_nacimiento': doctor.fecha_nacimiento,
+            'departamento': doctor.departamento_id,  # Cambié a la forma correcta
             'username': user.username,
         }
         return render(request, 'perfil_especialista.html', context)

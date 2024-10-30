@@ -32,8 +32,8 @@
                 <td>{{ apellido_materno }}</td>
             </tr>
             <tr>
-                <td><strong>Edad</strong></td>
-                <td>{{ edad }}</td>
+                <td><strong>Fecha de nacimiento</strong></td>
+                <td>{{ fecha_nacimiento }}</td>
             </tr>
             <tr>
                 <td><strong>Departamento</strong></td>
@@ -46,9 +46,7 @@
         </tbody>
     </table>
 
-    <div class="text-center mt-4">
-        <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>  <!-- Botón para editar el perfil -->
-    </div>
+    
 </div>
 
 {% endblock %}

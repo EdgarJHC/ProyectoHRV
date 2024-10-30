@@ -3,6 +3,9 @@ from .models import *
 
 
 # Registra el modelo Paciente y su clase administrativa asociada en la interfaz de administración de Django
-admin.site.register(Paciente)  # Esto permite que el modelo Paciente sea gestionado a través de la interfaz de administración
-admin.site.register(Especialista)
+admin.site.register(Paciente)
 admin.site.register(Departamento)
+admin.site.register(Especialista)
+admin.site.register(AnalisisDominioFrecuencia)
+admin.site.register(AnalisisDominioTiempo)
+admin.site.register(ECG)

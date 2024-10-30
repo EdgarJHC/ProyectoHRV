@@ -17,7 +17,7 @@ body {
 
 /* Título */
 h1.text-center {
-    color: #007bff; /* Color de texto azul para el título */
+    color: #031931; /* Color de texto azul para el título */
     margin-bottom: 20px; /* Espacio debajo del título */
     font-size: 2.2rem; /* Tamaño del título */
     font-weight: bold; /* Texto en negrita */
@@ -30,7 +30,7 @@ h1.text-center {
 }
 
 .table thead {
-    background-color: #007bff; /* Fondo azul para el encabezado */
+    background-color: #14171a; /* Fondo azul para el encabezado */
     color: #ffffff; /* Color de texto blanco en el encabezado */
 }
 
