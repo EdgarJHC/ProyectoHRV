@@ -32,6 +32,9 @@ urlpatterns = [
     # Ruta para la página de inicio del sitio, asignada a la vista 'home'.
     path('', views.home, name='home'),
     
+    
+    
+    path('homeDoctor/', views.homeDoctor, name='homeDoctor'),    
     # Ruta para el panel de administración de Django.
     path('admin/', admin.site.urls),
     
@@ -60,7 +63,13 @@ urlpatterns = [
     path('paciente/<int:paciente_id>/complete', views.complete_paciente, name='complete_paciente'),
     
     # Ruta para eliminar un paciente específico, utilizando el ID del paciente.
-    path('pacientes/<int:paciente_id>/delete', views.delete_paciente, name='delete_paciente'),
+    path('pacientes/<int:paciente_id>/eliminar', views.eliminar_paciente, name='eliminar_paciente'),
+    
+    
+    
+    # Ruta para editar un paciente específico, utilizando el ID del paciente.
+    path('pacientes/<int:paciente_id>/editar', views.editar_paciente, name='editar_paciente'),
+
     
     path('perfil_especialista/', views.perfil_doc, name='perfilEspecialista'), # Nueva vista para datos personales  
     path('error/', views.error_page, name='error_page'),  # Agrega esta línea

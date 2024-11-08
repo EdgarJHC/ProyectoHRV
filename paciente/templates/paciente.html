@@ -1,21 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles_paciente.css' %}">
+<script src="{% static 'js_paciente.js' %}"></script>
 <h1>Registros de Pacientes</h1>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Brand</a>
-    
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <form class="d-flex ms-auto" style="flex-grow: 1;">
-        <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search" style="width: 100%;">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
+<div class="card">
+  <div class="card-header">    
+    <form class="form-inline" method="GET" action="{% url 'pacientes' %}">
+      <input class="form-control mr-sm-2" type="text" placeholder="Buscar Paciente" name="query" aria-label="Buscar">
+      <button class="btn" type="submit" style="background-color: #004b69; color: white;">Buscar</button>
+  </form>
+  
+
+  <!-- Botón para crear nuevo paciente -->
+  <hr>
+  <a class="btn" href="{% url 'create_paciente' %}" role="button" style="background-color: #39baed; color: white;">Nuevo Paciente</a>
+</div>
       </form>
     </div>
   </div>
@@ -25,7 +28,6 @@
   <thead>
     <tr>
       <th>ID</th>  <!-- Asegúrate de mostrar el ID del paciente -->
-      <th>Nombre de Usuario</th>
       <th>Nombre(s)</th>
       <th>Apellido Paterno</th>
       <th>Apellido Materno</th>
@@ -35,37 +37,37 @@
       <th>Teléfono</th>
       <th>Correo Electrónico</th>
       <th>Fecha de Nacimiento</th>
+      <th>IMC</th>
       <th>Acciones</th>  <!-- Columna para acciones como ver detalles -->
     </tr>
   </thead>
   <tbody>
     {% for paciente in pacientes %}
-    <tr>
-      <td>{{ paciente.id }}</td>  <!-- Muestra el ID del paciente -->
-      <td>
-        <a href="{% url 'paciente_detail' paciente.id %}">  <!-- Enlace a la vista de detalles del paciente -->
-          {% if paciente.user.username %}  <!-- Asegúrate de acceder al campo correcto -->
-            <strong>{{ paciente.user.username }}</strong>  <!-- Asume que el nombre de usuario está en la relación user -->
-          {% else %}
-            {{ paciente.user.username }}
-          {% endif %}
-        </a>
-      </td>
-      <td>{{ paciente.nombre_paciente }}</td>  <!-- Cambiar description a nombre_paciente -->
-      <td>{{ paciente.apellido_paterno }}</td>
-      <td>{{ paciente.apellido_materno }}</td>
-      <td>{{ paciente.sexo }}</td>  <!-- Muestra el sexo del paciente -->
-      <td>{{ paciente.uso_de_medicamentos }}</td>  <!-- Muestra el uso de medicamentos -->
-      <td>{{ paciente.actividad_fisica }}</td>  <!-- Muestra la actividad física -->
-      <td>{{ paciente.telefono }}</td>
-      <td>{{ paciente.correo }}</td>  <!-- Asegúrate de mostrar el correo -->
-      <td>{{ paciente.fecha_nacimiento|date:'j M Y' }}</td>  <!-- Formato de fecha -->
-      <td>
-        <a href="{% url 'paciente_detail' paciente.id %}" class="btn btn-info btn-sm">Ver Detalles</a>  <!-- Botón para ver detalles -->
-      </td>
-    </tr>
+        <tr>
+              <td>{{paciente.id_paciente}}</td>
+              <td>{{ paciente.nombre_paciente }}</td>  <!-- Cambiar description a nombre_paciente -->
+              <td>{{ paciente.apellido_paterno }}</td>
+              <td>{{ paciente.apellido_materno }}</td>
+              <td>{{ paciente.sexo }}</td>  <!-- Muestra el sexo del paciente -->
+              <td>{{ paciente.uso_de_medicamentos }}</td>  <!-- Muestra el uso de medicamentos -->
+              <td>{{ paciente.actividad_fisica }}</td>  <!-- Muestra la actividad física -->
+              <td>{{ paciente.telefono }}</td>
+              <td>{{ paciente.correo }}</td>  <!-- Asegúrate de mostrar el correo -->
+              <td>{{ paciente.fecha_nacimiento|date:'j M Y' }}</td>  <!-- Formato de fecha -->
+              <td>{{paciente.imc}}</td>
+              <td>
+                    <div style="display: flex; gap: 15px; justify-content: center; align-items: center; padding: 5px;">
+                        
+                              <a class="btn btn-info" href="{% url 'editar_paciente' paciente.id_paciente %}" role="button" style="background-color: #1a5edd; color: white;">Editar</a>
+                              <a class="btn btn-warning" href="{% url 'paciente_detail' paciente.id_paciente%}" role="button" style="background-color: #139ab1; color: white;">Expediente</a>
+                              <a class="btn btn-danger" href="{% url 'eliminar_paciente' paciente.id_paciente %}" onclick="return confirm('¿Estás seguro de eliminar este registro?')" role="button" style="background-color: #de4444; color: white;">Borrar</a>
+                    </div>
+              </td>
+        </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
+</div>
 
 {% endblock %}

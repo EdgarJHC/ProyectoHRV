@@ -5,8 +5,9 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .models import Paciente, Especialista, Departamento
-from .forms import PacienteForm, UserRegistrationForm
+from .models import *
+from .forms import *
+
 
 def signup(request):
     if request.method == 'GET':
@@ -61,7 +62,7 @@ def signup(request):
                     especialista.save()
 
                     login(request, user)
-                    return redirect('pacientes')
+                    return redirect('homeDoctor')
                 except IntegrityError as e:
                     print(e)  # Esto imprimirá la excepción completa en la consola.
                     if 'UNIQUE constraint' in str(e):
@@ -92,8 +93,35 @@ def signup(request):
 # Vista para mostrar los pacientes pendientes (no completados)
 @login_required
 def pacientes(request):
-    pacientes = Paciente.objects.filter(user=request.user, fecha_nacimiento__isnull=True)
+    pacientes = Paciente.objects.all()  # O usa un filtro si es necesario
     return render(request, 'paciente.html', {"pacientes": pacientes})
+
+
+
+def editar_paciente(request, id):
+    paciente = get_object_or_404(Paciente, id_paciente=id)
+    if request.method == 'POST':
+        Formulario = PacienteForm(request.POST, request.FILES, instance=paciente)  # request.FILES para manejar archivos
+        if Formulario.is_valid():
+            Formulario.save()
+            return redirect('pacientes')  # Cambia a la vista que necesites después de guardar
+    else:
+        Formulario = PacienteForm(instance=paciente)
+    return render(request, 'pacientes/editar_paciente.html', {"form": PacienteForm()})
+
+'''En la plantilla editar.html, puedes usar el formulario de la siguiente manera:
+#{'Formulario': Formulario} significa que dentro de la plantillaeditar.html, puedes acceder a la instancia del formulario con la variable Formulario.'''
+
+
+
+def eliminar_paciente(request, id):
+    pacientes = get_object_or_404(Paciente, id_paciente=id) # referencia al campo de la clase 
+    pacientes.delete() # Elimina el paciente
+    return redirect('pacientes') # Redirige a la lista de pacientes
+
+
+
+
 
 # Vista para mostrar los pacientes completados
 @login_required
@@ -116,6 +144,7 @@ def create_paciente(request):
                 return redirect('pacientes')
             except ValueError:
                 return render(request, 'create_paciente.html', {"form": PacienteForm(), "error": "Surgió un error al crear al paciente."})
+        print(form.errors)
         return render(request, 'create_paciente.html', {"form": form, "error": "Por favor corrige los errores del formulario."})
 
 # Vista para mostrar la página de inicio

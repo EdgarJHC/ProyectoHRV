@@ -6,7 +6,6 @@ class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
         fields = [
-            'user',
             'nombre_paciente',
             'apellido_paterno',
             'apellido_materno',
@@ -16,7 +15,7 @@ class PacienteForm(forms.ModelForm):
             'fecha_nacimiento',
             'uso_de_medicamentos',
             'actividad_fisica',
-            'foto',
+            'imc'
         ]
         widgets = {
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),

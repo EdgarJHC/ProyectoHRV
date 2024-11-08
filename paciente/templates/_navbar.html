@@ -14,22 +14,25 @@
       aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
+    
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+
         <li class="nav-item">
           <a href="/" class="nav-link">Inicio</a>
         </li>
 
+
         {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a href="{% url 'homeDoctor' %}" class="nav-link">Inicio</a>
+        </li>
+
         <li class="nav-item">  
           <a href="{% url 'pacientes_completed' %}" class="nav-link">Registros terminados</a>
         </li>
         <li class="nav-item">
           <a href="{% url 'pacientes' %}" class="nav-link">Registros</a>
-        </li>
-        <li class="nav-item">
-          <a href="{% url 'create_paciente' %}" class="nav-link">Crear registro de paciente</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/logout">Cerrar sesión</a>
